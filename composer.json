@@ -1,0 +1,19 @@
+{
+    "description": "",
+    "type": "neos-package",
+    "name": "bytorsten/graphql",
+    "require": {
+        "neos/flow": "*",
+        "webonyx/graphql-php": "^0.9.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "ByTorsten\\GraphQL\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "ByTorsten.GraphQL"
+        }
+    }
+}

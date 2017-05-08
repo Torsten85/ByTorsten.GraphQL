@@ -1,0 +1,9 @@
+ByTorsten\GraphQL\Core\Cache\SchemaCache:
+  properties:
+    cache:
+      object:
+        factoryObjectName: Neos\Flow\Cache\CacheManager
+        factoryMethodName: getCache
+        arguments:
+          1:
+            value: ByTorsten_GraphQL_Schema

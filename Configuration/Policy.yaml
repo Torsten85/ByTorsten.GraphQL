@@ -1,0 +1,16 @@
+privilegeTargets:
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+    'ByTorsten.GraphQL:GraphiQLAccess':
+      matcher: 'method(ByTorsten\GraphQL\Controller\StandardController->.*Action())'
+    'ByTorsten.GraphQL:EndpointAccess':
+      matcher: 'method(ByTorsten\GraphQL\Controller\StandardController->queryAction())'
+
+roles:
+  'Neos.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'ByTorsten.GraphQL:GraphiQLAccess'
+        permission: GRANT
+      -
+        privilegeTarget: 'ByTorsten.GraphQL:EndpointAccess'
+        permission: GRANT

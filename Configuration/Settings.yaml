@@ -1,0 +1,16 @@
+ByTorsten:
+  GraphQL:
+    endpoints: []
+
+Neos:
+  Flow:
+    http:
+      chain:
+        process:
+          chain:
+            graphQLOptions:
+              position: 'before routing'
+              component: 'ByTorsten\GraphQL\Http\HttpOptionsComponent'
+    mvc:
+      routes:
+        'ByTorsten.GraphQL': true

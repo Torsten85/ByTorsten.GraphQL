@@ -1,0 +1,25 @@
+-
+  name: 'graphql - GraphiQL UI'
+  uriPattern: '{endpoint}'
+  defaults:
+    '@package':    'ByTorsten.GraphQL'
+    '@controller': 'Standard'
+    '@action':     'index'
+    '@format':     'html'
+  routeParts:
+    'endpoint':
+      handler: 'ByTorsten\GraphQL\Routing\EndpointRoutePartHandler'
+  appendExceedingArguments: true
+  httpMethods: [GET]
+
+-
+  name: 'graphql - endpoint'
+  uriPattern: '{endpoint}'
+  defaults:
+    '@package':    'ByTorsten.GraphQL'
+    '@controller': 'Standard'
+    '@action':     'query'
+  routeParts:
+    'endpoint':
+      handler: 'ByTorsten\GraphQL\Routing\EndpointRoutePartHandler'
+  httpMethods: [POST]
