@@ -17,8 +17,8 @@ ByTorsten:
 ```
 
 ### Add a graphql schema
-Simply place a file in `Resources/Private/GraphQL`. The filename doesn't metter as long as it has the `.graphql` extension.
-Multiple files will be merged into one single schema. This file uses the [grpahql schema language](http://graphql.org/learn/schema/).
+Simply place a file in `Resources/Private/GraphQL`. The filename doesn't matter as long as it has the `.graphql` extension.
+Multiple files will be merged into one single schema. This file uses the [grpahql schema language](http://graphql.org/learn/schema/). The compiles schema will be stored as an executable php script (PhpFrontend Cache), so no big worries about performance.
 
 ```
 type Query {
@@ -69,6 +69,7 @@ class QueryResolverController extends ResolverController
 }
 ```
 
+and 
 `VehicleResolverController.php`:
 ```
 <?php
