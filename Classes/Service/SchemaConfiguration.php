@@ -1,6 +1,8 @@
 <?php
 namespace ByTorsten\GraphQL\Service;
 
+use ByTorsten\GraphQL\Exception;
+use ByTorsten\GraphQL\Resolver\ContextInterface;
 use GraphQL\Type\Definition\CustomScalarType;
 use Neos\Flow\Annotations as Flow;
 
@@ -19,6 +21,11 @@ class SchemaConfiguration {
      * @var string
      */
     protected $resolverControllerNamePattern = '@package\@subpackage\Resolver\@resolverResolverController';
+
+    /**
+     * @var string
+     */
+    protected $contextNamePattern = '@package\@subpackage\Resolver\Context';
 
     /**
      * @Flow\Inject
@@ -165,5 +172,32 @@ class SchemaConfiguration {
         }
 
         return $this->schema;
+    }
+
+    /**
+     * @param $schema
+     * @param string $query
+     * @param array $variables
+     * @param string $operationName
+     * @return mixed
+     * @throws Exception
+     */
+    public function getContext($schema, string $query, $variables, $operationName)
+    {
+        $contextName = $this->contextNamePattern;
+        $contextName = str_replace('@package', str_replace('.', '\\', $this->packageKey), $contextName);
+        $contextName = str_replace('@subpackage', $this->subpackageKey, $contextName);
+        $contextName = str_replace('\\\\', '\\', $contextName);
+        $contextName = $this->objectManager->getCaseSensitiveObjectName($contextName);
+
+        if ($contextName) {
+            $context = $this->objectManager->get($contextName);
+
+            if (!$context instanceof ContextInterface) {
+                throw new Exception(sprintf('%s has to implement %s', $contextName, ContextInterface::class));
+            }
+
+            return $context->getContext($schema, $query, $variables ?? [], $operationName);
+        }
     }
 }

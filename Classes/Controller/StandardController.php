@@ -55,8 +55,10 @@ class StandardController extends ActionController
             $variables = json_decode($this->request->getArgument('variables'), true);
         }
 
-        $schema = $this->schemaService->forEndpoint($endpoint)->getSchema();
-        $result = $this->graphQLService->executeAndReturnResult($schema, $query, null, null, $variables, $operationName);
+        $schemaConfiguration = $this->schemaService->forEndpoint($endpoint);
+        $schema = $schemaConfiguration->getSchema();
+        $context = $schemaConfiguration->getContext($schema, $query, $variables, $operationName);
+        $result = $this->graphQLService->executeAndReturnResult($schema, $query, null, $context, $variables, $operationName);
         $this->view->assign('result', $result);
     }
 }
