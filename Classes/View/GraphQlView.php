@@ -8,6 +8,7 @@ use Neos\Flow\Http\Response as HttpResponse;
 use Neos\Flow\Log\SystemLoggerInterface;
 use Neos\Flow\Mvc\View\AbstractView;
 use Neos\Flow\Exception as FlowException;
+use Neos\Flow\Utility\Environment;
 
 class GraphQlView extends AbstractView
 {
@@ -17,6 +18,12 @@ class GraphQlView extends AbstractView
      * @var SystemLoggerInterface
      */
     protected $systemLogger;
+
+    /**
+     * @Flow\Inject
+     * @var Environment
+     */
+    protected $environment;
 
     /**
      * @return string The rendered view
@@ -52,11 +59,19 @@ class GraphQlView extends AbstractView
             'data' => $executionResult->data,
         ];
         if (!empty($executionResult->errors)) {
-            $convertedResult['errors'] = array_map(function(Error $error) {
+            $isDevelopment = $this->environment->getContext()->isDevelopment();
+            $convertedResult['errors'] = array_map(function(Error $error) use ($isDevelopment) {
                 $errorResult = [
-                    'message' => $error->message,
-                    'locations' => $error->getLocations()
+                    'message' => $error->message
                 ];
+
+                if ($isDevelopment) {
+                    $errorResult['locations'] = $error->getLocations();
+                    $errorResult['trace'] = array_map(function ($trace) {
+                        return sprintf('%s->%s:%s', $trace['class'] ?? '?', $trace['function'] ?? '?', $trace['line'] ?? '?');
+                    }, $error->getPrevious() ? $error->getPrevious()->getTrace() : $error->getTrace());
+                }
+
                 $exception = $error->getPrevious();
                 if ($exception instanceof FlowException) {
                     $errorResult['message'] = HttpResponse::getStatusMessageByCode($exception->getStatusCode());
