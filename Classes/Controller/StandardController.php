@@ -1,14 +1,10 @@
 <?php
 namespace ByTorsten\GraphQL\Controller;
 
-use ByTorsten\GraphQL\Core\Cache\SchemaCache;
-use ByTorsten\GraphQL\Service\SchemaBuilder;
-use GraphQL\Utils\BuildSchema;
-use GraphQL\Utils\SchemaPrinter;
 use Neos\Flow\Annotations as Flow;
 
+use ByTorsten\GraphQL\Service\GraphQLService;
 use ByTorsten\GraphQL\Service\SchemaService;
-use GraphQL\GraphQL;
 use Neos\Flow\Mvc\Controller\ActionController;
 use ByTorsten\GraphQL\View\GraphQlView;
 
@@ -30,6 +26,12 @@ class StandardController extends ActionController
      * @var SchemaService
      */
     protected $schemaService;
+
+    /**
+     * @Flow\Inject
+     * @var GraphQLService
+     */
+    protected $graphQLService;
 
     /**
      * @param string $endpoint
@@ -54,7 +56,7 @@ class StandardController extends ActionController
         }
 
         $schema = $this->schemaService->forEndpoint($endpoint)->getSchema();
-        $result = GraphQL::executeAndReturnResult($schema, $query, null, null, $variables, $operationName);
+        $result = $this->graphQLService->executeAndReturnResult($schema, $query, null, null, $variables, $operationName);
         $this->view->assign('result', $result);
     }
 }
