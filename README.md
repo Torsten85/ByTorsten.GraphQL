@@ -1,5 +1,5 @@
 # GraphQL - the flow way
-this graphql package was inspired by [Wwwision.GraphQL](https://github.com/bwaidelich/Wwwision.GraphQL). But it just felt like a wrapper, I'd like a package that seamlessly integrates in Flow. 
+this graphql package was inspired by [Wwwision.GraphQL](https://github.com/bwaidelich/Wwwision.GraphQL) (also some portion of their code was copied). But this just felt like a wrapper, I'd like a package that seamlessly integrates in Flow. 
 So here it is.
  
 ## Installation
@@ -99,5 +99,6 @@ class VehicleResolverController extends ResolverController
 }
 ```
 
-And thanks it.
-A more complete exmaple will follow.
+Due to the fact that the resolution of properties happen in normal controller methods,
+you can easly apply any restrictions to resolvers via your `Policy.yaml`.
+
