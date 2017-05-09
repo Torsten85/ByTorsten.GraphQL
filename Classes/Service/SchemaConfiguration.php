@@ -58,6 +58,16 @@ class SchemaConfiguration {
     protected $subpackageKey;
 
     /**
+     * @param string $typeName
+     * @return mixed
+     */
+    protected function getResolverClassNameFromType(string $typeName)
+    {
+        $resolverName = str_replace('@resolver', $typeName, $this->resolverControllerNameBase);
+        return $this->objectManager->getCaseSensitiveObjectName($resolverName);
+    }
+
+    /**
      * @param string $packageKey
      * @param string $subpackageKey
      */
@@ -90,8 +100,19 @@ class SchemaConfiguration {
 
         /** @var Type $type */
         foreach ($types as $type) {
-            $resolverName = str_replace('@resolver', $type->name, $this->resolverControllerNameBase);
-            $resolverName = $this->objectManager->getCaseSensitiveObjectName($resolverName);
+            $possibleTypeNames = [$type->name];
+
+            if ($type instanceof ObjectType) {
+                $possibleTypeNames = array_merge($possibleTypeNames, array_map(function (InterfaceType $interface) {
+                    return $interface->name;
+                }, $type->getInterfaces()));
+            }
+
+            $resolverNames = array_map(function ($possibleTypeName) {
+                return $this->getResolverClassNameFromType($possibleTypeName);
+            }, $possibleTypeNames);
+
+            $resolverName = $resolverNames[0];
 
             if ($resolverName !== false) {
 
@@ -113,20 +134,22 @@ class SchemaConfiguration {
                         return call_user_func_array([$class, 'parse'], func_get_args());
                     };
                 }
+            }
 
-                if ($type instanceof ObjectType) {
-                    foreach ($type->getFields() as $field) {
+            if ($type instanceof ObjectType || $type instanceof InterfaceType) {
+                foreach ($type->getFields() as $field) {
+                    foreach($resolverNames as $resolverName) {
                         $methodName = lcfirst($field->name) . 'Resolver';
                         if (method_exists($resolverName, $methodName)) {
                             $field->resolveFn = function () use ($resolverName, $methodName) {
                                 $class = $this->objectManager->get($resolverName);
                                 return call_user_func_array([$class, $methodName], func_get_args());
                             };
+                            break;
                         }
                     }
                 }
             }
-
         }
 
         return $schema;
