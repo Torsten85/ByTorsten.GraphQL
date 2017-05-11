@@ -1,16 +1,15 @@
 <?php
 namespace ByTorsten\GraphQL\Service;
 
-use ByTorsten\GraphQL\Exception;
-use ByTorsten\GraphQL\Resolver\ContextInterface;
-use GraphQL\Type\Definition\CustomScalarType;
 use Neos\Flow\Annotations as Flow;
 
+use ByTorsten\GraphQL\Exception;
+use ByTorsten\GraphQL\Resolver\ResolverContext;
 use ByTorsten\GraphQL\Core\Cache\SchemaCache;
+use GraphQL\Type\Definition\CustomScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\UnionType;
-
 use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
@@ -189,15 +188,12 @@ class SchemaConfiguration {
         $contextName = str_replace('@subpackage', $this->subpackageKey, $contextName);
         $contextName = str_replace('\\\\', '\\', $contextName);
         $contextName = $this->objectManager->getCaseSensitiveObjectName($contextName);
+        $contextName = $contextName ?: ResolverContext::class;
 
-        if ($contextName) {
-            $context = $this->objectManager->get($contextName);
-
-            if (!$context instanceof ContextInterface) {
-                throw new Exception(sprintf('%s has to implement %s', $contextName, ContextInterface::class));
-            }
-
-            return $context->getContext($schema, $query, $variables ?? [], $operationName);
+        if (!is_subclass_of($contextName, ResolverContext::class)) {
+            throw new Exception(sprintf('%s has to extend %s', $contextName, ResolverContext::class));
         }
+
+        return new $contextName($schema, $query, $variables ?? [], $operationName);
     }
 }
